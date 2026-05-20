@@ -34,14 +34,10 @@ stitch() {
     rm -f "$tmpfile"
 }
 
-for CAM in growcam watercam; do
-    INPUT="$INPUT_BASE/$CAM"
+for INPUT in "$INPUT_BASE"/*/; do
+    CAM=$(basename "$INPUT")
+    [[ "$CAM" == "timelapses" ]] && continue
     DAILY="$OUTPUT_DIR/${CAM}_${DATE}.mp4"
-
-    if [[ ! -d "$INPUT" ]]; then
-        echo "[$CAM] Skipping: $INPUT not found"
-        continue
-    fi
 
     img_count=$(find "$INPUT" -maxdepth 1 -name "${DATE}_*.jpg" | wc -l | tr -d ' ')
     if [[ "$img_count" -eq 0 ]]; then
