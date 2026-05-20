@@ -21,7 +21,8 @@ def frame_stats(rgb: np.ndarray) -> tuple:
     r, g, b = rgb[:, :, 0] / 255, rgb[:, :, 1] / 255, rgb[:, :, 2] / 255
     cmax = np.maximum(np.maximum(r, g), b)
     cmin = np.minimum(np.minimum(r, g), b)
-    sat = np.where(cmax > 0, (cmax - cmin) / cmax, 0.0)
+    with np.errstate(divide="ignore", invalid="ignore"):
+        sat = np.where(cmax > 0, (cmax - cmin) / cmax, 0.0)
     ch = rgb.mean(axis=(0, 1)) / 255.0
     return float(np.mean(lum)), float(np.mean(sat)), ch
 
