@@ -1,0 +1,10 @@
+.git
+.github
+.gitignore
+.venv
+.env
+*.mp4
+*.jpg
+*.jpeg
+timelapse.sh
+transcode.sh

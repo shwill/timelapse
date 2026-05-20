@@ -1,0 +1,15 @@
+services:
+  timelapse:
+    image: ghcr.io/shwill/timelapse:latest
+    build: .
+    container_name: timelapse-daily
+    pull_policy: always
+    environment:
+      TZ: ${TZ:-Europe/Berlin}
+      DATE: ${DATE:-}
+      PRESET: ${PRESET:-medium}
+      FPS: ${FPS:-24}
+    volumes:
+      - "${GROWCAMS_DATA_DIR:-/volume1/growcams}:/data"
+    labels:
+      com.centurylinklabs.watchtower.enable: "true"
