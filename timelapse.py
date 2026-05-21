@@ -70,11 +70,19 @@ def desaturation_ramp(modes: list, segs: list, blend: int) -> np.ndarray:
     n = len(modes)
     desat = np.zeros(n)
     for i, (start, end, mode) in enumerate(segs):
-        if mode == "color" and i + 1 < len(segs):
-            ramp_start = max(start, end - blend)
-            length = max(end - ramp_start - 1, 1)
-            for j in range(ramp_start, end):
-                desat[j] = (j - ramp_start) / length
+        if mode == "color":
+            # fade out: desat 0→1 over last blend_frames (evening, color→IR)
+            if i + 1 < len(segs):
+                ramp_start = max(start, end - blend)
+                length = max(end - ramp_start - 1, 1)
+                for j in range(ramp_start, end):
+                    desat[j] = (j - ramp_start) / length
+            # fade in: desat 1→0 over first blend_frames (morning, IR→color)
+            if i > 0 and segs[i - 1][2] == "ir":
+                ramp_end = min(end, start + blend)
+                length = max(ramp_end - start - 1, 1)
+                for j in range(start, ramp_end):
+                    desat[j] = max(desat[j], 1.0 - (j - start) / length)
     return desat
 
 
