@@ -47,6 +47,33 @@ def find_segments(modes: list) -> list:
     return segs
 
 
+CACHE_FILE = ".timelapse_cache.csv"
+
+
+def load_cache(input_dir: Path) -> dict:
+    p = input_dir / CACHE_FILE
+    if not p.exists():
+        return {}
+    cache = {}
+    with open(p, newline="") as f:
+        for row in csv.DictReader(f):
+            cache[row["filename"]] = (
+                float(row["luminance"]),
+                float(row["saturation"]),
+                np.array([float(row["r_mean"]), float(row["g_mean"]), float(row["b_mean"])]),
+            )
+    return cache
+
+
+def save_cache(input_dir: Path, cache: dict) -> None:
+    p = input_dir / CACHE_FILE
+    with open(p, "w", newline="") as f:
+        w = csv.writer(f)
+        w.writerow(["filename", "luminance", "saturation", "r_mean", "g_mean", "b_mean"])
+        for name, (lum, sat, ch) in sorted(cache.items()):
+            w.writerow([name, f"{lum:.2f}", f"{sat:.4f}", *[f"{c:.4f}" for c in ch]])
+
+
 def correction_factors(values: np.ndarray, window: int) -> np.ndarray:
     s = sg_smooth(values, window)
     return np.where(values > 1.0, s / values, 1.0)
@@ -71,13 +98,13 @@ def desaturation_ramp(modes: list, segs: list, blend: int) -> np.ndarray:
     desat = np.zeros(n)
     for i, (start, end, mode) in enumerate(segs):
         if mode == "color":
-            # fade out: desat 0→1 over last blend_frames (evening, color→IR)
+            # fade out: desat 0→1 over last blend frames (evening, color→IR)
             if i + 1 < len(segs):
                 ramp_start = max(start, end - blend)
                 length = max(end - ramp_start - 1, 1)
                 for j in range(ramp_start, end):
                     desat[j] = (j - ramp_start) / length
-            # fade in: desat 1→0 over first blend_frames (morning, IR→color)
+            # fade in: desat 1→0 over first blend frames (morning, IR→color)
             if i > 0 and segs[i - 1][2] == "ir":
                 ramp_end = min(end, start + blend)
                 length = max(ramp_end - start - 1, 1)
@@ -137,7 +164,7 @@ def main():
     ap.add_argument("output", nargs="?", help="Output MP4 (default: timelapse_<dir>.mp4)")
     ap.add_argument("--fps", type=int, default=24)
     ap.add_argument("--blend-frames", type=int, default=10,
-                    help="Output frames for color→IR cross-fade (default: 10)")
+                    help="Frames for day/night transition effect (default: 10)")
     ap.add_argument("--sat-threshold", type=float, default=SATURATION_IR_THRESHOLD,
                     help="Saturation below which a frame is classified as IR (default: 0.12)")
     ap.add_argument("--deflicker-window", type=int, default=61,
@@ -170,15 +197,24 @@ def main():
     print(f"Found {n} frames → {args.fps}fps → ~{n / args.fps:.1f}s → {output}")
 
     print("Pass 1/2: Analyzing frames...")
+    cache = load_cache(input_dir)
     lums = np.zeros(n)
     sats = np.zeros(n)
     ch_means = np.zeros((n, 3))
 
+    new_count = 0
     for i, p in enumerate(paths):
-        if i % 50 == 0:
-            print(f"  {i}/{n}...", end="\r", flush=True)
-        lums[i], sats[i], ch_means[i] = frame_stats(load_rgb(str(p)))
-    print(f"  {n}/{n} done.   ")
+        if p.name in cache:
+            lums[i], sats[i], ch_means[i] = cache[p.name]
+        else:
+            if new_count % 50 == 0:
+                print(f"  analyzing {i}/{n}...", end="\r", flush=True)
+            lums[i], sats[i], ch_means[i] = frame_stats(load_rgb(str(p)))
+            cache[p.name] = (lums[i], sats[i], ch_means[i])
+            new_count += 1
+
+    save_cache(input_dir, cache)
+    print(f"  {n}/{n} done ({new_count} new, {n - new_count} cached).   ")
 
     modes = ["ir" if s < args.sat_threshold else "color" for s in sats]
     segs = find_segments(modes)
