@@ -152,7 +152,7 @@ def main():
 
     paths = sorted(
         p for p in input_dir.iterdir()
-        if p.suffix.lower() in (".jpg", ".jpeg")
+        if p.suffix.lower() in (".jpg", ".jpeg", ".webp")
         and (not args.date or p.name.startswith(args.date))
     )
     if not paths:

@@ -39,7 +39,7 @@ for INPUT in "$INPUT_BASE"/*/; do
     [[ "$CAM" == "timelapses" ]] && continue
     DAILY="$OUTPUT_DIR/${CAM}_${DATE}.mp4"
 
-    img_count=$(find "$INPUT" -maxdepth 1 -name "${DATE}_*.jpg" | wc -l | tr -d ' ')
+    img_count=$(find "$INPUT" -maxdepth 1 \( -name "${DATE}_*.jpg" -o -name "${DATE}_*.webp" \) | wc -l | tr -d ' ')
     if [[ "$img_count" -eq 0 ]]; then
         echo "[$CAM] No images for $DATE, skipping encode"
     else
