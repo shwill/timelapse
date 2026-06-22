@@ -1,5 +1,6 @@
 from __future__ import annotations
 import argparse
+import json
 import os
 import sys
 from pathlib import Path
@@ -24,8 +25,8 @@ def build_app() -> FastAPI:
         return {"ok": True}
 
     def _cam_dir(cam: str) -> Path:
-        p = data_dir / cam
-        if not p.is_dir() or cam == "timelapses":
+        p = (data_dir / cam).resolve()
+        if not p.is_dir() or not p.is_relative_to(data_dir.resolve()):
             raise HTTPException(404, f"Camera '{cam}' not found")
         return p
 
@@ -67,12 +68,12 @@ def build_app() -> FastAPI:
     @app.get("/api/cameras/{cam}/frames/{filename}")
     def serve_frame(cam: str, filename: str):
         cam_dir = _cam_dir(cam)
-        p = cam_dir / filename
-        if not p.exists():
+        p = (cam_dir / filename).resolve()
+        if not p.exists() or not p.is_relative_to(cam_dir):
             raise HTTPException(404)
         return FileResponse(str(p))
 
-    @app.post("/api/cameras/{cam}/encode")
+    @app.get("/api/cameras/{cam}/encode")
     def trigger_encode(cam: str, date: str | None = None, preset: str = "medium"):
         cam_dir = _cam_dir(cam)
         cfg_file = cam_dir / "grow.json"
@@ -91,13 +92,13 @@ def build_app() -> FastAPI:
                 and (not date or p.name.startswith(date))
             )
             total = len(paths)
-            yield f"data: {{\"status\": \"starting\", \"total\": {total}}}\n\n"
+            yield f"data: {json.dumps({'status': 'starting', 'total': total})}\n\n"
 
             try:
                 encoder.encode(paths, cfg, str(out), denoise=True, preset=preset)
-                yield f"data: {{\"status\": \"done\", \"output\": \"{out.name}\"}}\n\n"
+                yield f"data: {json.dumps({'status': 'done', 'output': out.name})}\n\n"
             except Exception as e:
-                yield f"data: {{\"status\": \"error\", \"message\": \"{e}\"}}\n\n"
+                yield f"data: {json.dumps({'status': 'error', 'message': str(e)})}\n\n"
 
         return StreamingResponse(stream(), media_type="text/event-stream")
 

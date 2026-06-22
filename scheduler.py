@@ -82,7 +82,7 @@ def build_frame_schedule(paths: list[Path], config: GrowConfig) -> list[FrameEnt
             start_t = z_info.get("start_t", float("inf"))
             end_t = z_info.get("end_t", float("inf"))
 
-            ramp_in_start = start_t - sz.ramp_in_s
+            ramp_in_start = max(0.0, start_t - sz.ramp_in_s)
             ramp_out_end = end_t + sz.ramp_out_s
 
             if ramp_in_start <= output_t < start_t and sz.ramp_in_s > 0:

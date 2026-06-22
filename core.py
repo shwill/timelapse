@@ -46,7 +46,7 @@ def find_segments(modes: list) -> list:
 
 def correction_factors(values: np.ndarray, window: int) -> np.ndarray:
     s = sg_smooth(values, window)
-    return np.where(values > 1.0, s / values, 1.0)
+    return np.where(np.abs(values) > 1e-6, s / values, 1.0)
 
 
 def compute_corrections(lums, ch_means, modes, segs, window, use_wb):

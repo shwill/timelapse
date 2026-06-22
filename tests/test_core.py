@@ -55,6 +55,14 @@ def test_correction_factors_shape():
     assert np.all(cf > 0)
 
 
+def test_correction_factors_channel_means():
+    """Channel means are in [0,1] — correction should still activate."""
+    vals = np.array([0.5, 0.52, 0.48, 0.55, 0.45])
+    cf = correction_factors(vals, window=5)
+    assert cf.shape == vals.shape
+    assert not np.allclose(cf, 1.0, atol=0.01), "WB correction is disabled for sub-1.0 values"
+
+
 def test_compute_corrections_identity():
     """When all luminance values are equal, correction factors should be ~1.0."""
     n = 10

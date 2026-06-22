@@ -1,4 +1,5 @@
 from __future__ import annotations
+import functools
 import math
 from datetime import datetime
 from pathlib import Path
@@ -20,6 +21,7 @@ PHASE_COLORS = {
 FUTURE_COLOR = (255, 255, 255, 38)
 
 
+@functools.lru_cache(maxsize=16)
 def _load_font(weight: str, size: int) -> ImageFont.FreeTypeFont:
     name = {"regular": "BarlowCondensed-Regular.ttf",
             "semibold": "BarlowCondensed-SemiBold.ttf",
