@@ -1,0 +1,100 @@
+/* static/style.css */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0f0f14; --surface: #1e1e2e; --surface2: #181825;
+  --border: #313244; --text: #cdd6f4; --muted: #6c7086;
+  --accent: #7c6fff; --green: #a0f0a0; --yellow: #ffd080;
+  --red: #f38ba8; --orange: #fab387;
+}
+body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif;
+       font-size: 13px; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+/* Topbar */
+.topbar { background: var(--surface); border-bottom: 1px solid var(--border);
+          padding: 8px 16px; display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+.topbar .title { font-weight: 700; font-size: 14px; color: #cba6f7; }
+.topbar .stat { background: var(--border); border-radius: 4px; padding: 3px 8px; font-size: 11px; }
+.topbar .sep { flex: 1; }
+.btn { background: var(--accent); color: #fff; border: none; border-radius: 5px;
+       padding: 5px 14px; font-size: 12px; font-weight: 600; cursor: pointer; }
+.btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text);
+             border-radius: 5px; padding: 5px 12px; font-size: 12px; cursor: pointer; }
+.btn-note  { border-color: var(--yellow); color: var(--yellow); }
+.btn-zone  { border-color: var(--red);    color: var(--red); }
+
+/* Main layout */
+.main { display: flex; flex: 1; overflow: hidden; }
+
+/* Thumbnail strip */
+.thumbstrip { width: 88px; background: var(--surface2); border-right: 1px solid var(--border);
+              overflow-y: auto; flex-shrink: 0; padding: 6px; display: flex; flex-direction: column; gap: 3px; }
+.thumb { width: 74px; height: 42px; border-radius: 3px; border: 2px solid transparent;
+         cursor: pointer; overflow: hidden; flex-shrink: 0; background: var(--border); }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb.active { border-color: var(--accent); }
+
+/* Center panel */
+.center { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+/* Preview */
+.preview { height: 220px; background: #000; flex-shrink: 0; position: relative; }
+.preview img { width: 100%; height: 100%; object-fit: contain; }
+.preview-time { position: absolute; top: 8px; right: 10px;
+                font: 600 11px monospace; color: rgba(255,255,255,0.4); }
+
+/* Timeline */
+.timeline { flex: 1; background: var(--surface2); border-top: 1px solid var(--border);
+            display: flex; flex-direction: column; overflow: hidden; }
+.tl-toolbar { background: var(--surface); border-bottom: 1px solid var(--border);
+              padding: 6px 12px; display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.tl-label { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; }
+.tl-body { flex: 1; padding: 8px 12px; display: flex; flex-direction: column; gap: 6px; overflow: hidden; }
+
+/* Track rows */
+.track-row { display: flex; align-items: center; gap: 8px; }
+.row-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .07em;
+             width: 56px; flex-shrink: 0; text-align: right; }
+.track { flex: 1; height: 30px; background: var(--surface); border: 1px solid var(--border);
+         border-radius: 4px; position: relative; overflow: hidden; }
+.track.tall { height: 46px; }
+
+/* Phase segments */
+.phase-seg { position: absolute; top: 3px; bottom: 3px; border-radius: 3px;
+             display: flex; align-items: center; padding: 0 8px;
+             font-size: 10px; font-weight: 600; cursor: pointer; user-select: none; }
+.phase-seg.SEED  { background: rgba(166,227,161,.18); color: #a6e3a1; border: 1px solid rgba(166,227,161,.35); }
+.phase-seg.VEG   { background: rgba(148,226,213,.15); color: #94e2d5; border: 1px solid rgba(148,226,213,.3); }
+.phase-seg.BLOOM { background: rgba(250,179,135,.15); color: #fab387; border: 1px solid rgba(250,179,135,.3); }
+.phase-handle { position: absolute; right: 0; top: 0; bottom: 0; width: 7px;
+                background: rgba(255,255,255,.08); cursor: ew-resize;
+                display: flex; align-items: center; justify-content: center; font-size: 9px; color: rgba(255,255,255,.3); }
+
+/* Slow zone */
+.slow-zone { position: absolute; top: 3px; bottom: 3px; border-radius: 3px;
+             background: rgba(243,139,168,.12); border: 1px solid rgba(243,139,168,.35);
+             display: flex; align-items: center; justify-content: center;
+             font-size: 10px; font-weight: 600; color: var(--red); cursor: pointer; }
+.ramp-shade { position: absolute; top: 0; bottom: 0; background: rgba(243,139,168,.05); pointer-events: none; }
+
+/* Note bars */
+.note-bar { position: absolute; top: 5px; bottom: 5px; border-radius: 3px;
+            background: rgba(255,208,128,.10); border: 1px solid rgba(255,208,128,.35);
+            display: flex; align-items: center; padding: 0 6px;
+            font-size: 10px; color: var(--yellow); cursor: pointer; overflow: hidden; }
+.note-bar .nb-dur { font-size: 9px; color: rgba(255,208,128,.5); margin-left: 4px; flex-shrink: 0; }
+.note-handle { position: absolute; right: 0; top: 0; bottom: 0; width: 7px;
+               background: rgba(255,208,128,.15); cursor: ew-resize; }
+
+/* Ruler */
+.ruler { flex: 1; height: 18px; position: relative; border-bottom: 1px solid var(--border); margin-left: 64px; }
+.rtick { position: absolute; top: 1px; font-size: 9px; color: var(--muted); font-family: monospace; padding-left: 2px; }
+.rtick::after { content:''; position: absolute; bottom: 0; left: 0; width: 1px; height: 4px; background: var(--border); }
+
+/* Playhead */
+.playhead { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--accent);
+            pointer-events: none; z-index: 20; box-shadow: 0 0 6px rgba(124,111,255,.7); }
+
+/* Output estimate */
+.estimate { border-top: 1px solid var(--border); padding: 6px 12px; flex-shrink: 0;
+            display: flex; align-items: center; gap: 16px; font-size: 11px; color: var(--muted); }
+.estimate .total { color: var(--text); font-weight: 600; font-family: monospace; }

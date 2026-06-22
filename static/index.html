@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width">
+<title>🌿 Timelapse Editor</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<div class="topbar">
+  <span class="title">🌿 Timelapse Editor</span>
+  <select id="cam-select" style="background:var(--border);color:var(--text);border:none;border-radius:4px;padding:4px 8px;font-size:12px;"></select>
+  <span class="stat" id="frame-stat">— frames</span>
+  <span class="stat" id="date-stat">—</span>
+  <span class="sep"></span>
+  <button class="btn-ghost btn-zone" onclick="App.addSlowZone()">+ Slow Zone</button>
+  <button class="btn-ghost btn-note" onclick="App.addNote()">+ Note</button>
+  <button class="btn-ghost" onclick="App.addPhase()">+ Phase</button>
+  <button class="btn" onclick="App.encode()">Encode →</button>
+</div>
+
+<div class="main">
+  <div class="thumbstrip" id="thumbstrip"></div>
+
+  <div class="center">
+    <div class="preview">
+      <img id="preview-img" src="" alt="">
+      <div class="preview-time" id="preview-time"></div>
+    </div>
+
+    <div class="timeline">
+      <div class="tl-toolbar">
+        <span class="tl-label">Timeline</span>
+        <span style="color:var(--muted);font-size:11px;">Drag phase borders · click track to add</span>
+        <span class="sep"></span>
+        <span id="encode-status" style="font-size:11px;color:var(--muted);"></span>
+      </div>
+      <div class="tl-body">
+        <div class="track-row" style="height:18px;">
+          <span class="row-label"></span>
+          <div class="ruler" id="ruler"></div>
+        </div>
+        <div class="track-row">
+          <span class="row-label">Phases</span>
+          <div class="track" id="phase-track"></div>
+        </div>
+        <div class="track-row">
+          <span class="row-label">Speed</span>
+          <div class="track tall" id="speed-track"></div>
+        </div>
+        <div class="track-row">
+          <span class="row-label">Notes</span>
+          <div class="track tall" id="note-track"></div>
+        </div>
+      </div>
+      <div class="estimate">
+        <span id="estimate-text">Select a camera to start</span>
+        <span class="total" id="estimate-total"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="/app.js"></script>
+</body>
+</html>
