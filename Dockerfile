@@ -20,8 +20,14 @@ ENV PATH=/home/app/.local/bin:$PATH \
     PYTHONDONTWRITEBYTECODE=1
 
 WORKDIR /app
-COPY --chown=1000:1000 timelapse.py entrypoint.sh ./
+COPY --chown=1000:1000 \
+    core.py models.py scheduler.py overlay.py encoder.py app.py timelapse.py \
+    entrypoint.sh ./
+COPY --chown=1000:1000 fonts/ ./fonts/
+COPY --chown=1000:1000 static/ ./static/
 RUN chmod +x entrypoint.sh
+
+EXPOSE 8080
 
 USER 1000:1000
 

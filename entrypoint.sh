@@ -7,6 +7,9 @@ INPUT_BASE="${INPUT_BASE:-/data}"
 OUTPUT_DIR="${OUTPUT_DIR:-/data/timelapses}"
 DATE="${DATE:-$(date -d yesterday +%Y-%m-%d)}"
 
+export TIMELAPSE_DATA_DIR="$INPUT_BASE"
+export TIMELAPSE_OUTPUT_DIR="$OUTPUT_DIR"
+
 mkdir -p "$OUTPUT_DIR"
 
 stitch() {
@@ -34,21 +37,14 @@ stitch() {
     rm -f "$tmpfile"
 }
 
+if [[ "${EDITOR_MODE:-0}" == "1" ]]; then
+    exec python /app/app.py --editor --host 0.0.0.0 --port 8080
+fi
+
+python /app/app.py --encode --date "$DATE" --preset "$PRESET"
+
 for INPUT in "$INPUT_BASE"/*/; do
     CAM=$(basename "$INPUT")
     [[ "$CAM" == "timelapses" ]] && continue
-    DAILY="$OUTPUT_DIR/${CAM}_${DATE}.mp4"
-
-    img_count=$(find "$INPUT" -maxdepth 1 \( -name "${DATE}_*.jpg" -o -name "${DATE}_*.webp" \) | wc -l | tr -d ' ')
-    if [[ "$img_count" -eq 0 ]]; then
-        echo "[$CAM] No images for $DATE, skipping encode"
-    else
-        echo "[$CAM] Encoding $DATE ($img_count images) → $DAILY"
-        python /app/timelapse.py "$INPUT" "$DAILY" \
-            --date "$DATE" \
-            --fps "$FPS" \
-            --preset "$PRESET"
-    fi
-
     stitch "$CAM"
 done
